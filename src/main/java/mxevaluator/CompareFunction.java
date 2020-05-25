@@ -1,4 +1,4 @@
-package my.rules;
+package mxevaluator;
 
 public class CompareFunction extends TextEvaluatorFunction implements Cloneable {
 

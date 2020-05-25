@@ -1,4 +1,4 @@
-package my.rules;
+package mxevaluator;
 
 import org.mariuszgromada.math.mxparser.FunctionExtension;
 

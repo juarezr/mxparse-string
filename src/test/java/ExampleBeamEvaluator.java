@@ -1,5 +1,5 @@
-import my.rules.CompareFunction;
-import my.rules.PredicateEvaluator;
+import mxevaluator.CompareFunction;
+import mxevaluator.PredicateEvaluator;
 
 public final class ExampleBeamEvaluator extends PredicateEvaluator<ExampleBean> {
 
@@ -8,7 +8,6 @@ public final class ExampleBeamEvaluator extends PredicateEvaluator<ExampleBean> 
     private static final String[] VAR_TEXT = {"name", "country"};
 
     public ExampleBeamEvaluator(final String ruleExpression) throws RuntimeException {
-        //noinspection unchecked
         super(ruleExpression, CompareFunction.class);
     }
 
