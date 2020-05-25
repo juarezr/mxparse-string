@@ -15,6 +15,23 @@ import java.util.regex.Pattern;
  */
 public abstract class PredicateEvaluator<T> {
 
+    // (?:([\w]+)\(([^\)]+)\))
+    private final static String functionRegexp = "(?:([\\w]+)\\(([^\\)]+)\\))";
+    private final static Pattern functionPattern = Pattern.compile(functionRegexp);
+
+    // \s*([^,\s]+)\s*
+    private final static String paramRegexp = "\\s*([^,\\s]+)\\s*";
+    private final static Pattern paramPattern = Pattern.compile(paramRegexp);
+
+    // ^\s*([a-zA-Z][a-zA-Z_]*)\s*$
+    private final static String variableRegexp = "^([a-zA-Z][a-zA-Z0-9_]*)$";
+    private final static Pattern variablePattern = Pattern.compile(variableRegexp);
+
+    // ^(["'])(?:(?=(\\?))\2.)*?\1$
+    private final static String stringRegexp = "^([\"'])(?:(?=(\\\\?))\\2.)*?\\1$";
+    private final static Pattern stringPattern = Pattern.compile(stringRegexp);
+
+    // (["'])(?:(?=(\\?))\2.)*?\1
     private final static String quotesRegexp = "([\"'])(?:(?=(\\\\?))\\2.)*?\\1";
     private final static Pattern quotesPattern = Pattern.compile(quotesRegexp);
 
@@ -54,13 +71,37 @@ public abstract class PredicateEvaluator<T> {
         this.consts = new ArrayList<>();
         this.values = new ArrayList<>();
 
-        this.comparator = new TextEvaluatorFunction(this::getParameterText);
+        this.checkExpression(ruleExpression);
         final String parsed = this.parseQuotedText(ruleExpression);
+        this.comparator = new TextEvaluatorFunction(this::getParameterText);
 
         this.parser = new Expression(parsed);
         this.parser.addFunctions(new Function("compare", this.comparator));
 
         defineRuleVariables(ruleExpression);
+    }
+
+    private void checkExpression(final String ruleExpression) throws RuntimeException {
+        final Matcher matched = functionPattern.matcher(ruleExpression);
+
+        while (matched.find()) {
+            final String fexpr = matched.group(); // full match
+            final String fname = matched.group(1);
+            final String fpars = matched.group(2);
+            final Matcher params = paramPattern.matcher(fpars);
+            while (params.find()) {
+                final String parameter = params.group(1);
+                final Matcher validVar = variablePattern.matcher(parameter);
+                if (!validVar.matches()) {
+                    final Matcher validStr = stringPattern.matcher(parameter);
+                    if (!validStr.matches()) {
+                        final String msg = String.format("Parameter `%s` for function `%s` must be a variable or a string: %s",
+                                parameter, fname, fexpr);
+                        throw new RuntimeException(msg);
+                    }
+                }
+            }
+        }
     }
 
     private String parseQuotedText(final String ruleExpression) {

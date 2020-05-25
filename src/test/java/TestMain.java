@@ -23,6 +23,24 @@ public class TestMain {
         evaluateExpr("( compare(name, 'Bob') > 0 ) || ( compare(country, 'China') > 0 )");
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testingRulesWithFailure1() {
+
+        evaluateExpr("compare(name, 200) > 0");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testingRulesWithFailure2() {
+
+        evaluateExpr("compare(200, 'Alice') > 0");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testingRulesWithFailure3() {
+
+        evaluateExpr("compare('Bob', 200) > 0");
+    }
+
     private void evaluateExpr(final String ruleExpression) {
 
         show("Evaluating expression: %s: ", ruleExpression);
