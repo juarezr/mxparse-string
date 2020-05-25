@@ -15,9 +15,9 @@ public class ExampleBean {
 
     public static List<ExampleBean> getTestItems() {
         final List<ExampleBean> items = new ArrayList<>();
-        items.add(new ExampleBean("alice", "andorra", 33));
         items.add(new ExampleBean("bob", "brazil", 13));
-        items.add(new ExampleBean("chris", "china", 42));
+        items.add(new ExampleBean("fay", "france", 33));
+        items.add(new ExampleBean("ted", "turkey", 42));
         return items;
     }
 

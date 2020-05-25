@@ -16,13 +16,23 @@ public class TestMain {
     }
 
     @Test
-    public void testingRulesWithText() {
+    public void testingRulesWithCompare() {
+
+        evaluateExpr("compare(name, 'bob')");
 
         evaluateExpr("compare(name, 'bob') == 0");
 
         evaluateExpr("compare(country, 'china') == 0");
 
         evaluateExpr("compare(name, 'bob') == 0 || compare(country, 'china') == 0");
+    }
+
+    @Test
+    public void testingRulesWithPosition() {
+
+        evaluateExpr("position(country, 'zil')");
+
+        evaluateExpr("position(country, 'bra') >= 0");
     }
 
     @Test(expected = RuntimeException.class)
@@ -53,9 +63,9 @@ public class TestMain {
 
         for (final ExampleBean item : itemsToTest) {
 
-            final boolean ok = evaluator.evaluate(item);
+            final double res = evaluator.evaluate(item);
 
-            show("  * Evaluated '%s => %s", item, ok);
+            show("  * Evaluated %s => %.0f", item, res);
         }
     }
 

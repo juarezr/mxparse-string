@@ -1,5 +1,7 @@
 import mxevaluator.CompareFunction;
+import mxevaluator.PositionFunction;
 import mxevaluator.PredicateEvaluator;
+import mxevaluator.TextEvaluatorFunction;
 
 public final class ExampleBeamEvaluator extends PredicateEvaluator<ExampleBean> {
 
@@ -7,8 +9,10 @@ public final class ExampleBeamEvaluator extends PredicateEvaluator<ExampleBean> 
 
     private static final String[] VAR_TEXT = {"name", "country"};
 
+    private static final TextEvaluatorFunction[] FUNCS = {new CompareFunction(), new PositionFunction()};
+
     public ExampleBeamEvaluator(final String ruleExpression) throws RuntimeException {
-        super(ruleExpression, CompareFunction.class);
+        super(ruleExpression, FUNCS);
     }
 
     @Override

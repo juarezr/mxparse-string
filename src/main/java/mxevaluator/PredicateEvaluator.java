@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 public abstract class PredicateEvaluator<T> {
 
     // (?:([\w]+)\(([^\)]+)\))
+    @SuppressWarnings("RegExpRedundantEscape")
     private final static String functionRegexp = "(?:([\\w]+)\\(([^\\)]+)\\))";
     private final static Pattern functionPattern = Pattern.compile(functionRegexp);
 
@@ -65,8 +66,8 @@ public abstract class PredicateEvaluator<T> {
      * @param ruleExpression An MxParser expression containing the variables provided by the source class
      * @throws RuntimeException Fails when detecting errors in the expression provided
      */
-    @SafeVarargs
-    public <F extends TextEvaluatorFunction> PredicateEvaluator(final String ruleExpression, final Class<F>... functionList) throws RuntimeException {
+    public PredicateEvaluator(final String ruleExpression, final TextEvaluatorFunction... functionList)
+            throws RuntimeException {
 
         this.consts = new ArrayList<>();
         this.values = new ArrayList<>();
@@ -121,18 +122,9 @@ public abstract class PredicateEvaluator<T> {
         return parsed.toString();
     }
 
-    @SafeVarargs
-    private <F extends TextEvaluatorFunction>
-    void defineRuleFunctions(final String ruleExpression, final Class<F>... functionList) {
+    private void defineRuleFunctions(final String ruleExpression, final TextEvaluatorFunction... functionList) {
 
-        for (final Class<F> functionClass : functionList) {
-            final TextEvaluatorFunction function;
-            try {
-                function = functionClass.newInstance();
-            } catch (Exception ex) {
-                final String msg = String.format("Error creating function for expression: %s", ruleExpression);
-                throw new RuntimeException(msg, ex);
-            }
+        for (final TextEvaluatorFunction function : functionList) {
             function.setResolver(this::getParameterText);
 
             final String functionName = function.getFunctionName();
@@ -169,7 +161,7 @@ public abstract class PredicateEvaluator<T> {
         }
     }
 
-    public boolean evaluate(final T sourceBeam) throws RuntimeException {
+    public double evaluate(final T sourceBeam) throws RuntimeException {
 
         this.clearValues();
 
@@ -189,8 +181,7 @@ public abstract class PredicateEvaluator<T> {
                 arg.setArgumentValue(valueIndex);
             }
         }
-        final double success = this.parser.calculate();
-        return success != 0;
+        return this.parser.calculate();
     }
 
 
