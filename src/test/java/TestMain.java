@@ -18,27 +18,29 @@ public class TestMain {
     @Test
     public void testingRulesWithText() {
 
-        evaluateExpr("compare(name, 'Bob') > 0");
+        evaluateExpr("compare(name, 'bob') == 0");
 
-        evaluateExpr("( compare(name, 'Bob') > 0 ) || ( compare(country, 'China') > 0 )");
+        evaluateExpr("compare(country, 'china') == 0");
+
+        evaluateExpr("compare(name, 'bob') == 0 || compare(country, 'china') == 0");
     }
 
     @Test(expected = RuntimeException.class)
     public void testingRulesWithFailure1() {
 
-        evaluateExpr("compare(name, 200) > 0");
+        evaluateExpr("compare(name, 200) == 0");
     }
 
     @Test(expected = RuntimeException.class)
     public void testingRulesWithFailure2() {
 
-        evaluateExpr("compare(200, 'Alice') > 0");
+        evaluateExpr("compare(200, 'alice') == 0");
     }
 
     @Test(expected = RuntimeException.class)
     public void testingRulesWithFailure3() {
 
-        evaluateExpr("compare('Bob', 200) > 0");
+        evaluateExpr("compare('bob', 200) == 0");
     }
 
     private void evaluateExpr(final String ruleExpression) {

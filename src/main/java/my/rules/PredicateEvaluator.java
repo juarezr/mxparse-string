@@ -178,7 +178,7 @@ public abstract class PredicateEvaluator<T> {
 
 
     public int addConst(final String literal) {
-        final int valueIndex = consts.size() - 1;
+        final int valueIndex = (consts.size() + 1) * -1;
         this.consts.add(literal);
         return valueIndex;
     }
