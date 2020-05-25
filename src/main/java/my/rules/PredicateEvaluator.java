@@ -36,7 +36,6 @@ public abstract class PredicateEvaluator<T> {
     private final static Pattern quotesPattern = Pattern.compile(quotesRegexp);
 
     private final Expression parser;
-    private final TextEvaluatorFunction comparator;
 
     private final List<String> consts;
     private final List<String> values;
@@ -66,18 +65,17 @@ public abstract class PredicateEvaluator<T> {
      * @param ruleExpression An MxParser expression containing the variables provided by the source class
      * @throws RuntimeException Fails when detecting errors in the expression provided
      */
-    public PredicateEvaluator(final String ruleExpression) throws RuntimeException {
+    @SafeVarargs
+    public <F extends TextEvaluatorFunction> PredicateEvaluator(final String ruleExpression, final Class<F>... functionList) throws RuntimeException {
 
         this.consts = new ArrayList<>();
         this.values = new ArrayList<>();
 
         this.checkExpression(ruleExpression);
         final String parsed = this.parseQuotedText(ruleExpression);
-        this.comparator = new TextEvaluatorFunction(this::getParameterText);
-
         this.parser = new Expression(parsed);
-        this.parser.addFunctions(new Function("compare", this.comparator));
 
+        defineRuleFunctions(ruleExpression, functionList);
         defineRuleVariables(ruleExpression);
     }
 
@@ -121,6 +119,25 @@ public abstract class PredicateEvaluator<T> {
         }
         matched.appendTail(parsed);
         return parsed.toString();
+    }
+
+    @SafeVarargs
+    private <F extends TextEvaluatorFunction>
+    void defineRuleFunctions(final String ruleExpression, final Class<F>... functionList) {
+
+        for (final Class<F> functionClass : functionList) {
+            final TextEvaluatorFunction function;
+            try {
+                function = functionClass.newInstance();
+            } catch (Exception ex) {
+                final String msg = String.format("Error creating function for expression: %s", ruleExpression);
+                throw new RuntimeException(msg, ex);
+            }
+            function.setResolver(this::getParameterText);
+
+            final String functionName = function.getFunctionName();
+            this.parser.addFunctions(new Function(functionName, function));
+        }
     }
 
     private void defineRuleVariables(final String ruleExpression) {

@@ -1,3 +1,4 @@
+import my.rules.CompareFunction;
 import my.rules.PredicateEvaluator;
 
 public final class ExampleBeamEvaluator extends PredicateEvaluator<ExampleBean> {
@@ -7,7 +8,8 @@ public final class ExampleBeamEvaluator extends PredicateEvaluator<ExampleBean> 
     private static final String[] VAR_TEXT = {"name", "country"};
 
     public ExampleBeamEvaluator(final String ruleExpression) throws RuntimeException {
-        super(ruleExpression);
+        //noinspection unchecked
+        super(ruleExpression, CompareFunction.class);
     }
 
     @Override
